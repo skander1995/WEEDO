@@ -1,0 +1,10 @@
+Insert msg to send it to /api/weedo/:msg
+where it would be returned by socket here
+<input [(ngModel)]="newMessage" (keyup)="$event.keyCode == 13 && sendMessage()" />
+
+<div *ngFor="let message of messageList">
+<h3>{{message}}</h3>
+</div>
+
+<button (click)="sendMessage()">Send Message</button>
+<router-outlet></router-outlet>

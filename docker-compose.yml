@@ -1,0 +1,60 @@
+version: '3'
+services:
+  #SocketIO Service
+  socket:
+    container_name: socket
+    build:
+      context: ./NodeJs
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./NodeJs:/usr/src/app/
+    working_dir: /usr/src/app
+    environment:
+      PORT: 9001
+      FRONT_URL: localhost:4200
+    ports:
+      - "9001:9001"
+    networks:
+      - weedo-network
+
+  # Front
+  front:
+    container_name: front
+    build:
+      context: ./angular-app-socket
+      dockerfile: Dockerfile
+      args:
+        env: docker
+    restart: always
+    environment:
+       SOCKET_URL: http://localhost:9001
+    volumes:
+      - ./angular-app-socket:/app
+    links:
+      - socket
+    networks:
+      - weedo-network
+    ports:
+      - '8001:80'
+
+  python:
+    container_name: python
+    build:
+      context: ./Python
+      dockerfile: Dockerfile
+
+    volumes:
+      - ./:/code
+    environment:
+      BASE_API: http://socket:9001
+    links:
+      - socket
+    networks:
+      - weedo-network
+
+
+#Docker Networks
+networks:
+  weedo-network:
+    driver: bridge
